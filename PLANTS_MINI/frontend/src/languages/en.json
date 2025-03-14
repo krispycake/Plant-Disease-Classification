@@ -1,0 +1,107 @@
+{
+    "Pepper__bell___Bacterial_spot": {
+            "cause": [
+                "Xanthomonas bacteria",
+                "Warm, humid climate (25-30°C)",
+                "Infected seeds or soil"
+            ],
+            "precaution": [
+                "Use resistant varieties like Antebellum, Green Machine",
+                "Proper spacing, drip irrigation",
+                "Sanitation, crop rotation"
+            ],
+            "cure": [
+                "Copper-based bactericides",
+                "Copper + mancozeb, streptocycline alone or with Blitox 50",
+                "Destroy infected plants"
+            ]
+        },
+        "Potato___Early_blight": {  
+        "cause": [
+            "Alternaria solani fungus",
+            "Warm, alternating wet/dry (up to 30°C)",
+            "Infected debris or soil"
+        ],
+        "precaution": [
+            "Use Kufri Pukhraj resistant variety",
+            "Crop rotation, balanced nutrition",
+            "Proper spacing, drip irrigation"
+        ]
+    },
+    
+    "Tomato_Bacterial_spot": {
+             "cause": [
+            "Xanthomonas species",
+            "Warm, humid climate (24-30°C)",
+            "Infected seeds, tools"
+        ],
+        "precaution": [
+            "Disease-free seeds, resistant varieties",
+            "Crop rotation, spacing",
+            "Avoid overhead irrigation and handling wet plants. Can use hot water treatment of seeds at 50°C for 25 minutes"
+        ],
+        "cure": [
+            "Copper-based bactericides",
+            "Vermicompost seed treatment",
+            "Copper + mancozeb, acibenzolar-S-methyl (ASM)"
+        ]
+    },
+    
+    "Tomato_Early_blight": {
+            "cause": [
+            "Alternaria solani fungus",
+            "Warm, wet/dry cycle",
+            "Infected debris, soil"
+        ],
+        "precaution": [
+            "Use Indus 1030, Bangalore Red resistant varieties",
+            "Crop rotation, spacing",
+            "Maintain nitrogen levels"
+        ],
+        "cure": [
+            "Chlorothalonil, mancozeb",
+            "Systemic + contact fungicides",
+            "Destroy infected plants"
+        ]
+        },
+
+        "appTitle": "Plant Disease Classification",
+        "language": "Language",
+        "dropzoneText": "Drag & drop an image of a plant leaf, or click to select a file",
+        "supportedPlants": "Supports tomato, potato, and bell pepper plants",
+        "analyzing": "Analyzing plant image...",
+        "label": "Label",
+        "confidence": "Confidence",
+        "detailedInfo": "Detailed Information",
+        "causes": "Causes",
+        "precautions": "Precautions",
+        "treatment": "Treatment",
+        "clearButton": "Clear & Upload New Image",
+        "uploadError": "Error analyzing the image. Please try again.",
+  
+  "languageNames": {
+    "en": "English",
+    "hi": "हिंदी (Hindi)",
+    "mr": "मराठी (Marathi)"
+  },
+  
+  "diseases": {
+    "Tomato___Bacterial_spot": "Tomato - Bacterial Spot",
+    "Tomato___Early_blight": "Tomato - Early Blight",
+    "Tomato___Late_blight": "Tomato - Late Blight",
+    "Tomato___Leaf_Mold": "Tomato - Leaf Mold",
+    "Tomato___Septoria_leaf_spot": "Tomato - Septoria Leaf Spot",
+    "Tomato___Spider_mites": "Tomato - Spider Mites",
+    "Tomato___Target_Spot": "Tomato - Target Spot",
+    "Tomato___Tomato_Yellow_Leaf_Curl_Virus": "Tomato - Yellow Leaf Curl Virus",
+    "Tomato___Tomato_mosaic_virus": "Tomato - Mosaic Virus",
+    "Tomato___healthy": "Tomato - Healthy",
+    "Potato___Early_blight": "Potato - Early Blight",
+    "Potato___Late_blight": "Potato - Late Blight",
+    "Potato___healthy": "Potato - Healthy",
+    "Pepper__bell___Bacterial_spot": "Bell Pepper - Bacterial Spot",
+    "Pepper__bell___healthy": "Bell Pepper - Healthy"
+  }
+}
+    
+
