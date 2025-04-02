@@ -24,13 +24,21 @@ import {
   Select,
   MenuItem,
   FormControl,
-  InputLabel
+  InputLabel,
+  Tabs,
+  Tab,
+  Box
 } from "@material-ui/core";
 
 import { useDropzone } from 'react-dropzone';
 import { common } from '@material-ui/core/colors';
 import Clear from '@material-ui/icons/Clear';
 import TranslateIcon from '@material-ui/icons/Translate';
+import CameraAltIcon from '@material-ui/icons/CameraAlt';
+import PhotoLibraryIcon from '@material-ui/icons/PhotoLibrary';
+
+// Import WebcamCapture component
+import WebcamCapture from './WebcamCapture';
 
 // Import language files
 import enTranslations from './languages/en.json';
@@ -157,6 +165,14 @@ const useStyles = makeStyles((theme) => ({
   lowText: {
     color: '#f44336', // Red for low confidence
   },
+  tabRoot: {
+    flexGrow: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    borderRadius: '10px 10px 0 0',
+  },
+  tabIndicator: {
+    backgroundColor: '#ff5d00',
+  },
 }));
 
 const ImageUpload = () => {
@@ -167,6 +183,8 @@ const ImageUpload = () => {
   const [image, setImage] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [language, setLanguage] = useState('en');
+  const [tabValue, setTabValue] = useState(0);
+  
   let confidence = 0;
 
   // Get current translations
@@ -181,19 +199,80 @@ const ImageUpload = () => {
     }
   };
 
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
+
   const onDrop = useCallback((acceptedFiles) => {
     if (acceptedFiles && acceptedFiles.length > 0) {
+      // Clear any previous preview
+      if (preview) {
+        URL.revokeObjectURL(preview);
+        setPreview(undefined);
+      }
+      
       setSelectedFile(acceptedFiles[0]);
       setImage(true);
       setData(undefined);
+      
+      // Create preview URL for the dropped file
+      const objectUrl = URL.createObjectURL(acceptedFiles[0]);
+      setPreview(objectUrl);
     }
-  }, []);
+  }, [preview]);
 
   const { getRootProps, getInputProps } = useDropzone({ 
     onDrop, 
     accept: 'image/*',
     multiple: false
   });
+
+  // Handle image capture from WebcamCapture component
+  const handleCameraCapture = (file, previewUrl) => {
+    // Clean up any existing preview URL
+    if (preview) {
+      URL.revokeObjectURL(preview);
+    }
+    
+    setSelectedFile(file);
+    setPreview(previewUrl);
+    setImage(true);
+    setData(undefined);
+    setTabValue(0); // Switch back to the main tab
+  };
+
+  // Function to preprocess image file before sending
+  const preprocessImage = (file) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        // Create canvas for resizing
+        const canvas = document.createElement('canvas');
+        canvas.width = 256;
+        canvas.height = 256;
+        const ctx = canvas.getContext('2d');
+        
+        // Draw and resize the image to 256x256
+        ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, 256, 256);
+        
+        // Convert to blob
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const preprocessedFile = new File([blob], file.name, { type: "image/jpeg" });
+            resolve(preprocessedFile);
+          } else {
+            reject(new Error("Failed to preprocess image"));
+          }
+        }, 'image/jpeg', 0.95);
+      };
+      
+      img.onerror = () => {
+        reject(new Error("Failed to load image"));
+      };
+      
+      img.src = URL.createObjectURL(file);
+    });
+  };
 
   const getConfidenceColor = (confidence) => {
     if (confidence >= 80) return classes.confidentText;
@@ -205,13 +284,17 @@ const ImageUpload = () => {
     if (image && selectedFile) {
       setIsLoading(true);
       const formData = new FormData();
-      formData.append("file", selectedFile);
-  
+      
       try {
+        // Preprocess the image to 256x256 before sending
+        const preprocessedFile = await preprocessImage(selectedFile);
+        formData.append("file", preprocessedFile);
+        
         const res = await axios.post(
           `http://localhost:8000/predict?lang=${currentLanguage}`, 
           formData
         );
+        
         if (res.status === 200) {
           setData(res.data);
         }
@@ -227,25 +310,40 @@ const ImageUpload = () => {
   }, [image, selectedFile, language]);
   
   const clearData = () => {
+    // Clean up preview URL
+    if (preview) {
+      URL.revokeObjectURL(preview);
+    }
+    
     setData(null);
     setImage(false);
     setSelectedFile(null);
     setPreview(null);
   };
 
+  // Clean up when component unmounts
   useEffect(() => {
-    if (!selectedFile) {
-      setPreview(undefined);
-      return;
-    }
-    const objectUrl = URL.createObjectURL(selectedFile);
-    setPreview(objectUrl);
-  }, [selectedFile]);
+    return () => {
+      // Clean up the preview URL when component unmounts
+      if (preview) {
+        URL.revokeObjectURL(preview);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!preview) return;
-    sendFile();
-  }, [preview, sendFile]);
+    
+    // If the preview exists but image is not set, make sure to set it
+    if (!image && preview) {
+      setImage(true);
+    }
+    
+    // Only send the file if we have a preview URL and a selected file
+    if (selectedFile) {
+      sendFile();
+    }
+  }, [preview, selectedFile, sendFile, image]);
 
   if (data) {
     confidence = (parseFloat(data.confidence) * 100).toFixed(2);
@@ -274,6 +372,25 @@ const ImageUpload = () => {
       .replace(/Early_blight/i, "Early Blight")
       .replace(/Bacterial_spot/i, "Bacterial Spot");
   };
+
+  // Create camera-specific translations for WebcamCapture
+  const cameraTranslations = {
+    startCamera: t.startCamera || "Start Camera",
+    captureImage: t.captureImage || "Take Photo",
+    stopCamera: t.stopCamera || "Stop Camera",
+    cameraInstructions: t.cameraInstructions || "Position leaf in center of frame",
+    cameraNotSupported: t.cameraNotSupported || "Camera not supported on this device",
+    cameraAccessError: t.cameraAccessError || "Error accessing the camera",
+    cameraPermissionDenied: t.cameraPermissionDenied || "Camera permission denied",
+    cameraNotFound: t.cameraNotFound || "Camera not found",
+    selectCamera: t.selectCamera || "Select Camera",
+    refreshCameraList: t.refreshCameraList || "Refresh Camera List"
+  };
+
+  // For debugging
+  console.log("Preview URL:", preview);
+  console.log("Image state:", image);
+  console.log("Selected file:", selectedFile?.name);
 
   return (
     <React.Fragment>
@@ -314,25 +431,49 @@ const ImageUpload = () => {
         >
           <Grid item xs={12}>
             <Card className={`${classes.imageCard} ${!image ? classes.imageCardEmpty : ''}`}>
-              {image && <CardActionArea>
-                <CardMedia
-                  className={classes.media}
-                  image={preview}
-                  component="img"
-                  title="Uploaded Plant Leaf Image"
-                />
-              </CardActionArea>}
+              {image && preview && (
+                <CardActionArea>
+                  <CardMedia
+                    className={classes.media}
+                    image={preview}
+                    component="img"
+                    title="Plant Leaf Image"
+                  />
+                </CardActionArea>
+              )}
               {!image && (
                 <CardContent>
-                  <div {...getRootProps()} className={classes.dropzoneContainer}>
-                    <input {...getInputProps()} />
-                    <Typography variant="body1">
-                      {t.dropzoneText}
-                    </Typography>
-                    <Typography variant="caption" color="textSecondary">
-                      {t.supportedPlants}
-                    </Typography>
-                  </div>
+                  <Box className={classes.tabRoot}>
+                    <Tabs 
+                      value={tabValue} 
+                      onChange={handleTabChange}
+                      indicatorColor="primary"
+                      classes={{ indicator: classes.tabIndicator }}
+                      centered
+                    >
+                      <Tab icon={<PhotoLibraryIcon />} label={t.uploadImage || "Upload"} />
+                      <Tab icon={<CameraAltIcon />} label={t.useCamera || "Camera"} />
+                    </Tabs>
+                  </Box>
+                  
+                  {tabValue === 0 && (
+                    <div {...getRootProps()} className={classes.dropzoneContainer}>
+                      <input {...getInputProps()} />
+                      <Typography variant="body1">
+                        {t.dropzoneText}
+                      </Typography>
+                      <Typography variant="caption" color="textSecondary">
+                        {t.supportedPlants}
+                      </Typography>
+                    </div>
+                  )}
+                  
+                  {tabValue === 1 && (
+                    <WebcamCapture 
+                      onCapture={handleCameraCapture}
+                      translations={cameraTranslations}
+                    />
+                  )}
                 </CardContent>
               )}
               {data && (
