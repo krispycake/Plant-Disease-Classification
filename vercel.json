@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "PLANTS_MINI/api/**": {
+      "runtime": "python3.8"
+    }
+  }
+}
