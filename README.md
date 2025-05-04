@@ -10,6 +10,18 @@ ResNet18: Pre-trained and fine-tuned for plant disease detection.
 VGG16: Another CNN model trained for the same task.
 
 
+## HomePage
+![Image](https://github.com/user-attachments/assets/2537a184-6c6d-4dc8-bed1-8cf51ba48df2)
+
+## Multilingual Support 
+![Image](https://github.com/user-attachments/assets/cde22df6-fa56-4b99-b70c-254e49e9e1af)
+
+![Image](https://github.com/user-attachments/assets/6cf834e2-5fc8-474d-adca-9a70f271086b)
+
+## Camera Support
+![Image](https://github.com/user-attachments/assets/6c655d56-a04d-43a7-a02e-a32ce26cd6e6)
+
+
 ## Setup for Python:
 Ensure you have Python and necessary libraries installed. Recommended to use a virtual environment:
 
